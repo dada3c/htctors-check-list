@@ -145,6 +145,14 @@
     .manage-text { flex: 1; font-size: 0.9rem; color: #333; }
     .del-btn { background: none; border: 2px solid #e63946; color: #e63946; border-radius: 8px; padding: 4px 11px; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit; flex-shrink: 0; }
     .del-btn:active { background: #fff0f0; }
+    .edit-btn { background: none; border: 2px solid #aaa; color: #666; border-radius: 8px; padding: 4px 11px; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit; flex-shrink: 0; }
+    .edit-btn:active { background: #f5f5f5; }
+    .save-btn { background: #1a1a2e; border: none; color: white; border-radius: 8px; padding: 4px 11px; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit; flex-shrink: 0; }
+    .inline-edit { display: flex; flex-direction: column; gap: 7px; padding: 10px 0; border-bottom: 1px solid #f2f2f2; width: 100%; }
+    .inline-edit:last-child { border-bottom: none; }
+    .inline-edit select, .inline-edit input { padding: 8px 12px; border: 2px solid #ddd; border-radius: 10px; font-size: 0.9rem; font-family: inherit; color: #333; }
+    .inline-edit select:focus, .inline-edit input:focus { outline: none; border-color: #e63946; }
+    .inline-edit-btns { display: flex; gap: 8px; }
 
     /* Add forms */
     .add-form { margin-top: 16px; border-top: 2px dashed #eee; padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
@@ -453,19 +461,50 @@ function renderManageList() {
   });
 }
 
-function renderRuleManageList() {
+function renderRuleManageList(editingId = null) {
   const list = document.getElementById('ruleManageList');
   list.innerHTML = '';
   if (!rules.length) { list.innerHTML = '<div class="empty">尚無規則</div>'; return; }
   rules.forEach(rule => {
-    const row = document.createElement('div');
-    row.className = 'manage-row';
-    row.innerHTML = `
-      <span class="manage-badge ${rule.type}">${rule.type === 'reward' ? '🏆 獎勵' : '⚠️ 懲罰'}</span>
-      <span class="manage-text"><strong>${rule.title}</strong>　→ ${rule.result}</span>
-      <button class="del-btn" onclick="deleteRule('${rule.id}')">刪除</button>`;
-    list.appendChild(row);
+    if (rule.id === editingId) {
+      const row = document.createElement('div');
+      row.className = 'inline-edit';
+      row.innerHTML = `
+        <select id="edit-type-${rule.id}">
+          <option value="reward"  ${rule.type==='reward'  ? 'selected':''}>🏆 獎勵</option>
+          <option value="penalty" ${rule.type==='penalty' ? 'selected':''}>⚠️ 懲罰</option>
+        </select>
+        <input id="edit-title-${rule.id}"  value="${rule.title}"  placeholder="標題" />
+        <input id="edit-desc-${rule.id}"   value="${rule.desc||''}" placeholder="說明（選填）" />
+        <input id="edit-result-${rule.id}" value="${rule.result}" placeholder="結果" />
+        <div class="inline-edit-btns">
+          <button class="save-btn" onclick="saveRuleEdit('${rule.id}')">✓ 儲存</button>
+          <button class="edit-btn" onclick="renderRuleManageList()">取消</button>
+        </div>`;
+      list.appendChild(row);
+    } else {
+      const row = document.createElement('div');
+      row.className = 'manage-row';
+      row.innerHTML = `
+        <span class="manage-badge ${rule.type}">${rule.type === 'reward' ? '🏆 獎勵' : '⚠️ 懲罰'}</span>
+        <span class="manage-text"><strong>${rule.title}</strong>　→ ${rule.result}</span>
+        <button class="edit-btn" onclick="renderRuleManageList('${rule.id}')">編輯</button>
+        <button class="del-btn"  onclick="deleteRule('${rule.id}')">刪除</button>`;
+      list.appendChild(row);
+    }
   });
+}
+
+async function saveRuleEdit(id) {
+  const type   = document.getElementById(`edit-type-${id}`).value;
+  const title  = document.getElementById(`edit-title-${id}`).value.trim();
+  const desc   = document.getElementById(`edit-desc-${id}`).value.trim();
+  const result = document.getElementById(`edit-result-${id}`).value.trim();
+  if (!title || !result) { showToast('標題和結果為必填'); return; }
+  rules = rules.map(r => r.id === id ? { ...r, type, title, desc, result } : r);
+  await saveRules();
+  renderRuleManageList();
+  showToast('✅ 規則已更新！');
 }
 
 async function deleteTask(id) {
