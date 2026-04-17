@@ -13,6 +13,69 @@
       padding-bottom: 48px;
     }
 
+    /* ── 密碼鎖畫面 ── */
+    .lock-screen {
+      position: fixed; inset: 0;
+      background: #1a1a2e;
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0;
+    }
+    .lock-screen.hidden { display: none; }
+
+    .lock-icon  { font-size: 3.5rem; margin-bottom: 12px; }
+    .lock-title { color: white; font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+    .lock-sub   { color: rgba(255,255,255,0.45); font-size: 0.85rem; margin-bottom: 28px; }
+
+    .pin-display {
+      display: flex; gap: 14px; margin-bottom: 28px;
+    }
+    .pin-dot {
+      width: 18px; height: 18px; border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: transparent;
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .pin-dot.filled { background: #e63946; border-color: #e63946; }
+    .pin-dot.shake  { animation: dotshake 0.4s ease; }
+    @keyframes dotshake {
+      0%,100% { transform: translateX(0); }
+      20%     { transform: translateX(-6px); }
+      60%     { transform: translateX(6px); }
+    }
+
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 70px);
+      gap: 12px;
+    }
+    .num-btn {
+      width: 70px; height: 70px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.07);
+      color: white;
+      font-size: 1.5rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .num-btn:active { background: rgba(255,255,255,0.2); }
+    .num-btn.del-key { font-size: 1.1rem; }
+    .num-btn.empty   { visibility: hidden; cursor: default; }
+
+    .lock-error {
+      color: #e63946; font-size: 0.85rem;
+      margin-top: 16px; min-height: 20px;
+      font-weight: 600;
+    }
+
+    /* ── General ── */
     .header {
       background: #1a1a2e;
       color: white;
@@ -42,32 +105,11 @@
     }
 
     /* Today summary */
-    .today-row {
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
-    .today-num {
-      font-size: 4rem;
-      font-weight: 900;
-      color: #e63946;
-      line-height: 1;
-      flex-shrink: 0;
-    }
+    .today-row { display: flex; align-items: center; gap: 20px; }
+    .today-num { font-size: 4rem; font-weight: 900; color: #e63946; line-height: 1; flex-shrink: 0; }
     .today-right { flex: 1; }
-    .today-label {
-      font-size: 0.95rem;
-      color: #555;
-      margin-bottom: 10px;
-      font-weight: 600;
-    }
-    .today-bar-bg {
-      background: #eee;
-      border-radius: 20px;
-      height: 18px;
-      overflow: hidden;
-      border: 2px solid #ddd;
-    }
+    .today-label { font-size: 0.95rem; color: #555; margin-bottom: 10px; font-weight: 600; }
+    .today-bar-bg { background: #eee; border-radius: 20px; height: 18px; overflow: hidden; border: 2px solid #ddd; }
     .today-bar-fill {
       height: 100%;
       background: linear-gradient(90deg, #e63946, #ff6b6b);
@@ -77,189 +119,104 @@
     }
 
     /* Task status list */
-    .task-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 11px 0;
-      border-bottom: 1px solid #f2f2f2;
-      font-size: 0.95rem;
-    }
+    .task-row { display: flex; align-items: center; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f2f2f2; font-size: 0.95rem; }
     .task-row:last-child { border-bottom: none; }
     .task-icon { font-size: 1.2rem; flex-shrink: 0; }
     .task-name { flex: 1; color: #333; font-weight: 500; }
     .task-name.done { text-decoration: line-through; color: #bbb; }
 
     /* 7-day history */
-    .history-wrap {
-      display: flex;
-      gap: 6px;
-      align-items: flex-end;
-      height: 110px;
-    }
-    .bar-col {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100%;
-      justify-content: flex-end;
-      gap: 4px;
-    }
+    .history-wrap { display: flex; gap: 6px; align-items: flex-end; height: 110px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; gap: 4px; }
     .bar-pct { font-size: 0.68rem; color: #888; font-weight: 700; min-height: 14px; }
-    .bar-bg {
-      width: 100%;
-      background: #eee;
-      border-radius: 6px 6px 0 0;
-      height: 72px;
-      display: flex;
-      align-items: flex-end;
-      overflow: hidden;
-    }
-    .bar-fill {
-      width: 100%;
-      background: linear-gradient(to top, #c1121f, #e63946);
-      border-radius: 6px 6px 0 0;
-      transition: height 0.6s cubic-bezier(.4,0,.2,1);
-    }
+    .bar-bg { width: 100%; background: #eee; border-radius: 6px 6px 0 0; height: 72px; display: flex; align-items: flex-end; overflow: hidden; }
+    .bar-fill { width: 100%; background: linear-gradient(to top, #c1121f, #e63946); border-radius: 6px 6px 0 0; transition: height 0.6s cubic-bezier(.4,0,.2,1); }
     .bar-fill.today-col { background: linear-gradient(to top, #e63946, #ff6b6b); }
     .bar-day { font-size: 0.75rem; color: #999; font-weight: 600; }
 
-    /* Task management */
-    .manage-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 11px 0;
-      border-bottom: 1px solid #f2f2f2;
-    }
+    /* Manage rows (tasks & rules shared style) */
+    .manage-row { display: flex; align-items: center; gap: 10px; padding: 11px 0; border-bottom: 1px solid #f2f2f2; }
     .manage-row:last-child { border-bottom: none; }
-    .manage-badge {
-      font-size: 0.72rem;
-      background: #f0f0f0;
-      border-radius: 6px;
-      padding: 3px 7px;
-      color: #666;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    .manage-badge { font-size: 0.72rem; background: #f0f0f0; border-radius: 6px; padding: 3px 7px; color: #666; white-space: nowrap; flex-shrink: 0; }
+    .manage-badge.reward  { background: #fff8e1; color: #b8860b; }
+    .manage-badge.penalty { background: #fff0f0; color: #c0392b; }
     .manage-text { flex: 1; font-size: 0.9rem; color: #333; }
-    .del-btn {
-      background: none;
-      border: 2px solid #e63946;
-      color: #e63946;
-      border-radius: 8px;
-      padding: 4px 11px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: inherit;
-      flex-shrink: 0;
-    }
+    .del-btn { background: none; border: 2px solid #e63946; color: #e63946; border-radius: 8px; padding: 4px 11px; font-size: 0.8rem; font-weight: 700; cursor: pointer; font-family: inherit; flex-shrink: 0; }
     .del-btn:active { background: #fff0f0; }
 
-    /* Add task form */
-    .add-form {
-      margin-top: 16px;
-      border-top: 2px dashed #eee;
-      padding-top: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
+    /* Add forms */
+    .add-form { margin-top: 16px; border-top: 2px dashed #eee; padding-top: 16px; display: flex; flex-direction: column; gap: 10px; }
     .add-form select,
-    .add-form input[type="text"] {
-      padding: 11px 14px;
-      border: 2px solid #ddd;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      font-family: inherit;
-      color: #333;
-      width: 100%;
-    }
+    .add-form input[type="text"] { padding: 11px 14px; border: 2px solid #ddd; border-radius: 12px; font-size: 0.95rem; font-family: inherit; color: #333; width: 100%; }
     .add-form select:focus,
-    .add-form input:focus {
-      outline: none;
-      border-color: #e63946;
-    }
-    .add-btn {
-      background: #e63946;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      padding: 13px;
-      font-size: 1rem;
-      font-weight: 800;
-      cursor: pointer;
-      font-family: inherit;
-      transition: opacity 0.15s;
-    }
+    .add-form input:focus { outline: none; border-color: #e63946; }
+    .add-btn { background: #e63946; color: white; border: none; border-radius: 12px; padding: 13px; font-size: 1rem; font-weight: 800; cursor: pointer; font-family: inherit; transition: opacity 0.15s; }
     .add-btn:active { opacity: 0.8; }
 
-    .back-link {
-      text-align: center;
-      padding: 24px 0 0;
-      font-size: 0.9rem;
-    }
-    .back-link a {
-      color: #e63946;
-      text-decoration: none;
-      font-weight: 700;
-    }
+    .back-link { text-align: center; padding: 24px 0 0; font-size: 0.9rem; }
+    .back-link a { color: #e63946; text-decoration: none; font-weight: 700; margin: 0 10px; }
 
     .empty { color: #bbb; font-size: 0.9rem; padding: 8px 0; }
-    .toast {
-      position: fixed;
-      bottom: 24px; left: 50%; transform: translateX(-50%);
-      background: #1a1a2e;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 50px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      z-index: 999;
-      opacity: 0;
-      transition: opacity 0.3s;
-      pointer-events: none;
-      white-space: nowrap;
-    }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1a1a2e; color: white; padding: 12px 24px; border-radius: 50px; font-size: 0.95rem; font-weight: 600; z-index: 999; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; }
     .toast.show { opacity: 1; }
   </style>
 </head>
 <body>
+
+<!-- 密碼鎖畫面 -->
+<div class="lock-screen" id="lockScreen">
+  <div class="lock-icon">🔒</div>
+  <div class="lock-title">爸媽專區</div>
+  <div class="lock-sub">請輸入 4 位數密碼</div>
+  <div class="pin-display" id="pinDisplay">
+    <div class="pin-dot" id="d0"></div>
+    <div class="pin-dot" id="d1"></div>
+    <div class="pin-dot" id="d2"></div>
+    <div class="pin-dot" id="d3"></div>
+  </div>
+  <div class="numpad">
+    <button class="num-btn" onclick="pressNum('1')">1</button>
+    <button class="num-btn" onclick="pressNum('2')">2</button>
+    <button class="num-btn" onclick="pressNum('3')">3</button>
+    <button class="num-btn" onclick="pressNum('4')">4</button>
+    <button class="num-btn" onclick="pressNum('5')">5</button>
+    <button class="num-btn" onclick="pressNum('6')">6</button>
+    <button class="num-btn" onclick="pressNum('7')">7</button>
+    <button class="num-btn" onclick="pressNum('8')">8</button>
+    <button class="num-btn" onclick="pressNum('9')">9</button>
+    <button class="num-btn empty"></button>
+    <button class="num-btn" onclick="pressNum('0')">0</button>
+    <button class="num-btn del-key" onclick="pressDelete()">⌫</button>
+  </div>
+  <div class="lock-error" id="lockError"></div>
+</div>
 
 <div class="header">
   <h1>📊 小赫任務 Dashboard</h1>
   <div class="sub">爸媽專區</div>
 </div>
 
-<!-- Today -->
 <div class="card">
   <div class="card-title">📅 今日狀況</div>
   <div class="today-row">
     <div class="today-num" id="todayNum">–</div>
     <div class="today-right">
       <div class="today-label" id="todayLabel">載入中...</div>
-      <div class="today-bar-bg">
-        <div class="today-bar-fill" id="todayBar" style="width:0%"></div>
-      </div>
+      <div class="today-bar-bg"><div class="today-bar-fill" id="todayBar" style="width:0%"></div></div>
     </div>
   </div>
 </div>
 
-<!-- Task status -->
 <div class="card">
   <div class="card-title">✅ 任務明細</div>
   <div id="taskStatusList"><div class="empty">載入中...</div></div>
 </div>
 
-<!-- 7-day history -->
 <div class="card">
   <div class="card-title">📈 最近 7 天完成率</div>
   <div class="history-wrap" id="historyWrap"></div>
 </div>
 
-<!-- Task management -->
 <div class="card">
   <div class="card-title">⚙️ 任務管理</div>
   <div id="manageList"><div class="empty">載入中...</div></div>
@@ -275,13 +232,81 @@
   </div>
 </div>
 
-<div class="back-link"><a href="index.html">← 回到小赫的頁面</a></div>
+<!-- 賞罰規則管理 -->
+<div class="card">
+  <div class="card-title">📜 賞罰規則管理</div>
+  <div id="ruleManageList"><div class="empty">載入中...</div></div>
+  <div class="add-form">
+    <select id="newRuleType">
+      <option value="reward">🏆 獎勵</option>
+      <option value="penalty">⚠️ 懲罰</option>
+    </select>
+    <input type="text" id="newRuleTitle" placeholder="規則標題（例：當週全勤）" />
+    <input type="text" id="newRuleDesc"  placeholder="說明（例：週一到週五全部完成）" />
+    <input type="text" id="newRuleResult" placeholder="結果（例：週末加 1 小時 3C）" />
+    <button class="add-btn" onclick="addRule()">＋ 新增規則</button>
+  </div>
+</div>
+
+<div class="back-link">
+  <a href="index.html">← 小赫頁面</a>
+  <a href="rules.html">📜 規則表</a>
+</div>
 
 <div class="toast" id="toast"></div>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
+// ── 密碼鎖 ──
+const CORRECT_PIN = '1108';
+let pinInput = '';
+
+function checkSession() {
+  if (sessionStorage.getItem('dashAuth') === 'ok') {
+    document.getElementById('lockScreen').classList.add('hidden');
+    init();
+  }
+}
+
+function pressNum(n) {
+  if (pinInput.length >= 4) return;
+  pinInput += n;
+  updateDots();
+  if (pinInput.length === 4) setTimeout(checkPin, 200);
+}
+
+function pressDelete() {
+  pinInput = pinInput.slice(0, -1);
+  updateDots();
+  document.getElementById('lockError').textContent = '';
+}
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('d' + i).classList.toggle('filled', i < pinInput.length);
+  }
+}
+
+function checkPin() {
+  if (pinInput === CORRECT_PIN) {
+    sessionStorage.setItem('dashAuth', 'ok');
+    document.getElementById('lockScreen').classList.add('hidden');
+    init();
+  } else {
+    document.getElementById('lockError').textContent = '密碼錯誤，請再試一次';
+    for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.add('shake');
+    setTimeout(() => {
+      pinInput = '';
+      updateDots();
+      for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.remove('shake');
+    }, 500);
+  }
+}
+
+checkSession();
+
+// ── Firebase ──
 firebase.initializeApp({
   apiKey: "AIzaSyBWNtSjDKSsRco_kmrxY9BTpeUZjffZgY4",
   authDomain: "htctors-check-list.firebaseapp.com",
@@ -308,7 +333,15 @@ const DEFAULT_TASKS = [
   { id:'t13', section:'🌙 睡覺前',      text:'準時上床（不超過 10:30）' },
 ];
 
+const DEFAULT_RULES = [
+  { id:'r1', type:'reward',  title:'當週全勤',          desc:'週一到週五每天所有任務全部完成。',       result:'週末加 1 小時 3C 時間' },
+  { id:'r2', type:'reward',  title:'自動整理書包不需提醒', desc:'爸媽沒有提醒，自己主動整理好書包。',    result:'隔天可晚睡 15 分鐘' },
+  { id:'r3', type:'penalty', title:'聯絡簿未簽名被老師發現', desc:'因為沒有主動拿出聯絡簿，導致老師在學校發現未簽名。', result:'當天無 3C 時間' },
+  { id:'r4', type:'penalty', title:'說謊隱瞞事情',       desc:'發生事情沒有主動告知爸媽，或說謊掩飾。', result:'3C 時間扣 30 分鐘' },
+];
+
 let tasks = [];
+let rules  = [];
 let todayCompletions = {};
 const today = getDateStr(0);
 
@@ -320,16 +353,22 @@ function getDateStr(offset) {
 
 function getDayLabel(offset) {
   const labels = ['日','一','二','三','四','五','六'];
-  const d = new Date();
-  d.setDate(d.getDate() + offset);
+  const d = new Date(); d.setDate(d.getDate() + offset);
   return offset === 0 ? '今' : labels[d.getDay()];
 }
 
 async function init() {
+  // Tasks
   const cfg = await db.collection('config').doc('tasks').get();
   tasks = (cfg.exists && cfg.data().tasks?.length) ? cfg.data().tasks : DEFAULT_TASKS;
 
-  // Real-time today listener
+  // Rules
+  const rcfg = await db.collection('config').doc('rules').get();
+  rules = (rcfg.exists && rcfg.data().rules?.length) ? rcfg.data().rules : DEFAULT_RULES;
+  if (!rcfg.exists || !rcfg.data().rules?.length) {
+    await db.collection('config').doc('rules').set({ rules: DEFAULT_RULES });
+  }
+
   db.collection('checklist').doc(today).onSnapshot(doc => {
     todayCompletions = doc.exists ? (doc.data().completions || {}) : {};
     renderTodaySummary();
@@ -337,6 +376,7 @@ async function init() {
   });
 
   renderManageList();
+  renderRuleManageList();
   await loadHistory();
 }
 
@@ -344,12 +384,9 @@ function renderTodaySummary() {
   const total = tasks.length;
   const done  = tasks.filter(t => todayCompletions[t.id]).length;
   const pct   = total ? Math.round(done / total * 100) : 0;
-
   document.getElementById('todayNum').textContent   = `${done}/${total}`;
   document.getElementById('todayLabel').textContent =
-    done === total && total > 0
-      ? '🎉 全部完成！小赫今天超棒！'
-      : `完成度 ${pct}%`;
+    done === total && total > 0 ? '🎉 全部完成！小赫今天超棒！' : `完成度 ${pct}%`;
   document.getElementById('todayBar').style.width = pct + '%';
 }
 
@@ -371,25 +408,20 @@ function renderTaskStatus() {
 async function loadHistory() {
   const wrap = document.getElementById('historyWrap');
   wrap.innerHTML = '';
-
   const promises = [];
   for (let i = -6; i <= 0; i++) promises.push(db.collection('checklist').doc(getDateStr(i)).get());
   const docs = await Promise.all(promises);
-
   docs.forEach((doc, idx) => {
     const offset = idx - 6;
     const comps  = doc.exists ? (doc.data().completions || {}) : {};
     const done   = tasks.filter(t => comps[t.id]).length;
     const total  = tasks.length;
     const pct    = total ? Math.round(done / total * 100) : 0;
-
     const col = document.createElement('div');
     col.className = 'bar-col';
     col.innerHTML = `
-      <div class="bar-pct">${pct > 0 ? pct + '%' : ''}</div>
-      <div class="bar-bg">
-        <div class="bar-fill${offset === 0 ? ' today-col' : ''}" style="height:${pct}%"></div>
-      </div>
+      <div class="bar-pct">${pct > 0 ? pct+'%' : ''}</div>
+      <div class="bar-bg"><div class="bar-fill${offset===0?' today-col':''}" style="height:${pct}%"></div></div>
       <div class="bar-day">${getDayLabel(offset)}</div>`;
     wrap.appendChild(col);
   });
@@ -406,6 +438,21 @@ function renderManageList() {
       <span class="manage-badge">${task.section}</span>
       <span class="manage-text">${task.text}</span>
       <button class="del-btn" onclick="deleteTask('${task.id}')">刪除</button>`;
+    list.appendChild(row);
+  });
+}
+
+function renderRuleManageList() {
+  const list = document.getElementById('ruleManageList');
+  list.innerHTML = '';
+  if (!rules.length) { list.innerHTML = '<div class="empty">尚無規則</div>'; return; }
+  rules.forEach(rule => {
+    const row = document.createElement('div');
+    row.className = 'manage-row';
+    row.innerHTML = `
+      <span class="manage-badge ${rule.type}">${rule.type === 'reward' ? '🏆 獎勵' : '⚠️ 懲罰'}</span>
+      <span class="manage-text"><strong>${rule.title}</strong>　→ ${rule.result}</span>
+      <button class="del-btn" onclick="deleteRule('${rule.id}')">刪除</button>`;
     list.appendChild(row);
   });
 }
@@ -429,9 +476,31 @@ async function addTask() {
   showToast('✅ 任務已新增！');
 }
 
-async function saveTasks() {
-  await db.collection('config').doc('tasks').set({ tasks });
+async function deleteRule(id) {
+  if (!confirm('確定要刪除這條規則？')) return;
+  rules = rules.filter(r => r.id !== id);
+  await saveRules();
+  renderRuleManageList();
+  showToast('規則已刪除');
 }
+
+async function addRule() {
+  const type   = document.getElementById('newRuleType').value;
+  const title  = document.getElementById('newRuleTitle').value.trim();
+  const desc   = document.getElementById('newRuleDesc').value.trim();
+  const result = document.getElementById('newRuleResult').value.trim();
+  if (!title || !result) { showToast('標題和結果為必填'); return; }
+  rules.push({ id: 'r' + Date.now(), type, title, desc, result });
+  await saveRules();
+  document.getElementById('newRuleTitle').value  = '';
+  document.getElementById('newRuleDesc').value   = '';
+  document.getElementById('newRuleResult').value = '';
+  renderRuleManageList();
+  showToast('✅ 規則已新增！');
+}
+
+async function saveTasks() { await db.collection('config').doc('tasks').set({ tasks }); }
+async function saveRules()  { await db.collection('config').doc('rules').set({ rules }); }
 
 function showToast(msg) {
   const el = document.getElementById('toast');
@@ -439,8 +508,6 @@ function showToast(msg) {
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2200);
 }
-
-init();
 </script>
 </body>
 </html>
