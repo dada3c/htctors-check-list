@@ -252,6 +252,64 @@
       100% { transform: translateY(110vh) rotate(600deg); opacity: 0; }
     }
 
+    /* 董家家規 */
+    .rules-box {
+      margin: 14px 12px 0;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 3px solid #c9a84c;
+      box-shadow: 4px 4px 0 #c9a84c44;
+    }
+    .rules-header {
+      background: linear-gradient(135deg, #2d2000, #1a1200);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .rules-header-title {
+      color: #f5e6c0;
+      font-weight: 900;
+      font-size: 1rem;
+      letter-spacing: 2px;
+    }
+    .rules-toggle {
+      color: #c9a84c;
+      font-size: 0.85rem;
+      transition: transform 0.3s;
+    }
+    .rules-toggle.open { transform: rotate(180deg); }
+    .rules-body {
+      background: #1a1900;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease;
+    }
+    .rules-body.open { max-height: 800px; }
+    .rules-chapter {
+      padding: 10px 16px 4px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+    .rules-chapter.reward  { color: #f5c842; }
+    .rules-chapter.penalty { color: #e05a5a; }
+    .rule-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 7px 16px;
+      border-top: 1px solid #2a2800;
+    }
+    .rule-row-num  { color: #6a5a30; font-size: 0.72rem; flex-shrink: 0; }
+    .rule-row-title { color: #f5e6c0; font-size: 0.88rem; font-weight: 700; flex-shrink: 0; }
+    .rule-row-arrow { color: #6a5a30; font-size: 0.8rem; flex-shrink: 0; }
+    .rule-row-result { color: #c9a84c; font-size: 0.82rem; flex: 1; }
+    .rules-empty { color: #4a4030; font-size: 0.85rem; padding: 12px 16px; }
+
     .footer {
       text-align: center;
       padding: 24px 0 0;
@@ -277,6 +335,17 @@
     <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
   </div>
   <div class="stars-row" id="starsRow"></div>
+</div>
+
+<!-- 董家家規 -->
+<div class="rules-box">
+  <div class="rules-header" onclick="toggleRules()">
+    <span class="rules-header-title">📜 董家家規</span>
+    <span class="rules-toggle" id="rulesToggle">▼</span>
+  </div>
+  <div class="rules-body" id="rulesBody">
+    <div id="rulesContent"><div class="rules-empty">載入中...</div></div>
+  </div>
 </div>
 
 <div id="tasksContainer"></div>
@@ -364,6 +433,53 @@ async function init() {
 
   renderTasks();
   updateProgress();
+  loadRules();
+}
+
+function toggleRules() {
+  const body   = document.getElementById('rulesBody');
+  const toggle = document.getElementById('rulesToggle');
+  const open   = body.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+}
+
+async function loadRules() {
+  const nums = ['一','二','三','四','五','六','七','八','九','十'];
+  db.collection('config').doc('rules').onSnapshot(snap => {
+    const rules = (snap.exists && snap.data().rules) ? snap.data().rules : [];
+    const rewards  = rules.filter(r => r.type === 'reward');
+    const penalties = rules.filter(r => r.type === 'penalty');
+    const el = document.getElementById('rulesContent');
+    let html = '';
+
+    if (!rules.length) {
+      html = '<div class="rules-empty">尚無規則</div>';
+    } else {
+      if (rewards.length) {
+        html += '<div class="rules-chapter reward">🏆 獎勵篇</div>';
+        rewards.forEach((r, i) => {
+          html += `<div class="rule-row">
+            <span class="rule-row-num">第${nums[i]||i+1}條</span>
+            <span class="rule-row-title">${r.title}</span>
+            <span class="rule-row-arrow">→</span>
+            <span class="rule-row-result">${r.result}</span>
+          </div>`;
+        });
+      }
+      if (penalties.length) {
+        html += '<div class="rules-chapter penalty">⚠️ 懲罰篇</div>';
+        penalties.forEach((r, i) => {
+          html += `<div class="rule-row">
+            <span class="rule-row-num">第${nums[i]||i+1}條</span>
+            <span class="rule-row-title">${r.title}</span>
+            <span class="rule-row-arrow">→</span>
+            <span class="rule-row-result">${r.result}</span>
+          </div>`;
+        });
+      }
+    }
+    el.innerHTML = html;
+  });
 }
 
 function renderTasks() {
