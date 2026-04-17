@@ -85,6 +85,8 @@
     }
     .header h1 { font-size: 1.5rem; font-weight: 900; }
     .header .sub { font-size: 0.85rem; opacity: 0.6; margin-top: 4px; }
+    .lock-btn { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: rgba(255,255,255,0.12); border: none; color: rgba(255,255,255,0.7); border-radius: 8px; padding: 6px 12px; font-size: 0.8rem; cursor: pointer; font-family: inherit; }
+    .lock-btn:active { background: rgba(255,255,255,0.2); }
 
     .card {
       background: white;
@@ -191,9 +193,10 @@
   <div class="lock-error" id="lockError"></div>
 </div>
 
-<div class="header">
+<div class="header" style="position:relative">
   <h1>📊 小赫任務 Dashboard</h1>
   <div class="sub">爸媽專區</div>
+  <button class="lock-btn" onclick="lockDashboard()">🔒 鎖定</button>
 </div>
 
 <div class="card">
@@ -302,6 +305,14 @@ function checkPin() {
       for (let i = 0; i < 4; i++) document.getElementById('d' + i).classList.remove('shake');
     }, 500);
   }
+}
+
+function lockDashboard() {
+  sessionStorage.removeItem('dashAuth');
+  pinInput = '';
+  updateDots();
+  document.getElementById('lockError').textContent = '';
+  document.getElementById('lockScreen').classList.remove('hidden');
 }
 
 checkSession();
