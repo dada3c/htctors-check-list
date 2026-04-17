@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 小赫每日 checklist 紀錄
+    match /checklist/{document} {
+      allow read, write: if true;
+    }
+
+    // 任務設定（爸媽可新增/刪除任務）
+    match /config/{document} {
+      allow read, write: if true;
+    }
+
+    // 其他集合預設禁止存取
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

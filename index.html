@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>⚡ 小赫的每日任務</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+      background: #1a1a2e;
+      min-height: 100vh;
+      padding-bottom: 60px;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #c1121f 0%, #e63946 60%, #ff6b6b 100%);
+      color: white;
+      padding: 20px 20px 16px;
+      text-align: center;
+      border-bottom: 5px solid #222;
+      position: relative;
+      overflow: hidden;
+    }
+    .header::before {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: 50%; transform: translateX(-50%);
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      border: 5px solid rgba(255,255,255,0.15);
+    }
+    .header h1 {
+      font-size: 1.7rem;
+      font-weight: 900;
+      text-shadow: 3px 3px 0 rgba(0,0,0,0.25);
+      letter-spacing: 1px;
+    }
+    .header .date {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-top: 6px;
+    }
+
+    /* Progress */
+    .progress-box {
+      background: white;
+      padding: 16px 20px 12px;
+      border-bottom: 3px solid #ddd;
+    }
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #222;
+      margin-bottom: 8px;
+    }
+    .progress-bar-bg {
+      background: #eee;
+      border-radius: 20px;
+      height: 22px;
+      overflow: hidden;
+      border: 2.5px solid #333;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #e63946, #ff6b6b);
+      border-radius: 20px;
+      transition: width 0.5s cubic-bezier(.4,0,.2,1);
+      min-width: 0;
+    }
+    .stars-row {
+      text-align: center;
+      font-size: 1.3rem;
+      margin-top: 10px;
+      letter-spacing: 3px;
+      min-height: 28px;
+    }
+
+    /* Section */
+    .section {
+      margin: 14px 12px 0;
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      border: 3px solid #222;
+      box-shadow: 5px 5px 0 #222;
+    }
+    .section-header {
+      background: #222;
+      color: #FFD700;
+      padding: 10px 16px;
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* Task item */
+    .task-item {
+      display: flex;
+      align-items: center;
+      padding: 14px 16px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      gap: 14px;
+      transition: background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .task-item:last-child { border-bottom: none; }
+    .task-item:active { background: #fff5f5; }
+    .task-item.done .task-text {
+      text-decoration: line-through;
+      color: #bbb;
+    }
+
+    /* Pokéball */
+    .pokeball {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 3px solid #222;
+      flex-shrink: 0;
+      position: relative;
+      background: linear-gradient(to bottom, #ccc 50%, #fff 50%);
+      transition: background 0.25s;
+      cursor: pointer;
+    }
+    .pokeball::before {
+      content: '';
+      position: absolute;
+      left: 0; right: 0;
+      top: 50%; transform: translateY(-50%);
+      height: 3px;
+      background: #222;
+    }
+    .pokeball::after {
+      content: '';
+      position: absolute;
+      width: 13px;
+      height: 13px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #222;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .pokeball.checked {
+      background: linear-gradient(to bottom, #e63946 50%, #fff 50%);
+    }
+    .pokeball.checked::after { background: #ffccd5; }
+
+    .pokeball.bounce { animation: pokebounce 0.35s ease; }
+    @keyframes pokebounce {
+      0%   { transform: scale(1); }
+      30%  { transform: scale(0.65) rotate(-12deg); }
+      70%  { transform: scale(1.25) rotate(8deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .task-text {
+      font-size: 1rem;
+      color: #1a1a2e;
+      line-height: 1.45;
+      font-weight: 500;
+      flex: 1;
+    }
+
+    /* Milestone overlay */
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.75);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    .overlay.show { display: flex; animation: fadein 0.25s ease; }
+    @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+
+    .milestone-card {
+      background: white;
+      border-radius: 28px;
+      padding: 36px 28px 28px;
+      text-align: center;
+      border: 4px solid #222;
+      box-shadow: 8px 8px 0 #222;
+      max-width: 300px;
+      width: 88%;
+      animation: popcard 0.35s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes popcard {
+      from { transform: scale(0.7); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .milestone-emoji {
+      font-size: 5rem;
+      display: block;
+      margin-bottom: 12px;
+      animation: spin 0.6s ease-out;
+    }
+    @keyframes spin {
+      from { transform: rotate(-180deg) scale(0); }
+      to   { transform: rotate(0deg) scale(1); }
+    }
+    .milestone-title {
+      font-size: 1.7rem;
+      font-weight: 900;
+      color: #e63946;
+      margin-bottom: 8px;
+    }
+    .milestone-sub {
+      font-size: 0.95rem;
+      color: #555;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+    .milestone-btn {
+      background: #e63946;
+      color: white;
+      border: 3px solid #222;
+      border-radius: 50px;
+      padding: 13px 36px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 #222;
+      transition: transform 0.1s, box-shadow 0.1s;
+      font-family: inherit;
+    }
+    .milestone-btn:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 #222;
+    }
+
+    /* Confetti */
+    .confetti-wrap {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 199;
+      overflow: hidden;
+    }
+    .cp {
+      position: absolute;
+      animation: cfall 1.8s ease-in forwards;
+    }
+    @keyframes cfall {
+      0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(600deg); opacity: 0; }
+    }
+
+    .footer {
+      text-align: center;
+      padding: 24px 0 0;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.85rem;
+    }
+    .footer a { color: rgba(255,255,255,0.55); text-decoration: none; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>⚡ 小赫的每日任務 ⚡</h1>
+  <div class="date" id="dateDisplay"></div>
+</div>
+
+<div class="progress-box">
+  <div class="progress-top">
+    <span>今日進度</span>
+    <span id="progressText">載入中...</span>
+  </div>
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressBar" style="width:0%"></div>
+  </div>
+  <div class="stars-row" id="starsRow"></div>
+</div>
+
+<div id="tasksContainer"></div>
+
+<div class="footer"><a href="dashboard.html">📊 爸媽 Dashboard</a></div>
+
+<!-- Milestone overlay -->
+<div class="overlay" id="overlay">
+  <div class="milestone-card">
+    <span class="milestone-emoji" id="mEmoji">⚡</span>
+    <div class="milestone-title" id="mTitle">太棒了！</div>
+    <div class="milestone-sub" id="mSub">繼續加油！</div>
+    <button class="milestone-btn" onclick="closeOverlay()">繼續！</button>
+  </div>
+</div>
+
+<div class="confetti-wrap" id="confettiWrap"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBWNtSjDKSsRco_kmrxY9BTpeUZjffZgY4",
+  authDomain: "htctors-check-list.firebaseapp.com",
+  projectId: "htctors-check-list",
+  storageBucket: "htctors-check-list.firebasestorage.app",
+  messagingSenderId: "443973354141",
+  appId: "1:443973354141:web:4769604bfdfca42d1d4a74"
+});
+const db = firebase.firestore();
+
+const DEFAULT_TASKS = [
+  { id:'t1',  section:'🍱 回家後',      text:'把聯絡簿拿出來給爸媽簽名' },
+  { id:'t2',  section:'🍱 回家後',      text:'吃晚餐' },
+  { id:'t3',  section:'📝 作業與閱讀',  text:'把今天的作業全部寫完' },
+  { id:'t4',  section:'📝 作業與閱讀',  text:'作業寫完讓爸媽檢查' },
+  { id:'t5',  section:'📝 作業與閱讀',  text:'閱讀時間完成 📖' },
+  { id:'t6',  section:'🎒 睡前準備',    text:'對照課表把明天的書裝進書包' },
+  { id:'t7',  section:'🎒 睡前準備',    text:'確認聯絡簿已簽名、放回書包' },
+  { id:'t8',  section:'🎒 睡前準備',    text:'削好明天要用的鉛筆' },
+  { id:'t9',  section:'🎒 睡前準備',    text:'有考卷要給爸媽簽名嗎？（有就拿出來）' },
+  { id:'t10', section:'🎒 睡前準備',    text:'文具盒裡有橡皮擦和尺' },
+  { id:'t11', section:'🎒 睡前準備',    text:'倒垃圾' },
+  { id:'t12', section:'🌙 睡覺前',      text:'洗澡洗臉刷牙' },
+  { id:'t13', section:'🌙 睡覺前',      text:'準時上床（不超過 10:30）' },
+];
+
+const MILESTONES = {
+  3:  { emoji:'⚡', title:'起步快！',   sub:'完成 3 個任務！電力全開！' },
+  6:  { emoji:'🔥', title:'燃燒吧！',   sub:'完成 6 個！像小火龍一樣熱情！' },
+  9:  { emoji:'💧', title:'穩穩的！',   sub:'完成 9 個！快到終點了！' },
+  12: { emoji:'🌿', title:'差一點！',   sub:'12 個搞定！最後衝刺！' },
+};
+const FINAL = { emoji:'🏆', title:'全部完成！', sub:'小赫今天太厲害了！\n所有任務全解鎖！' };
+
+let tasks = [];
+let completions = {};
+const today = getToday();
+let shownMilestones = JSON.parse(localStorage.getItem('ms_' + today) || '[]');
+
+function getToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+// Date header
+const d = new Date();
+const days = ['日','一','二','三','四','五','六'];
+document.getElementById('dateDisplay').textContent =
+  `${d.getMonth()+1} 月 ${d.getDate()} 日（週${days[d.getDay()]}）`;
+
+async function init() {
+  const cfg = await db.collection('config').doc('tasks').get();
+  tasks = (cfg.exists && cfg.data().tasks?.length) ? cfg.data().tasks : DEFAULT_TASKS;
+  if (!cfg.exists || !cfg.data().tasks?.length) {
+    await db.collection('config').doc('tasks').set({ tasks: DEFAULT_TASKS });
+  }
+
+  const rec = await db.collection('checklist').doc(today).get();
+  completions = rec.exists ? (rec.data().completions || {}) : {};
+
+  renderTasks();
+  updateProgress();
+}
+
+function renderTasks() {
+  const container = document.getElementById('tasksContainer');
+  container.innerHTML = '';
+  const sections = {};
+  tasks.forEach(t => { (sections[t.section] = sections[t.section] || []).push(t); });
+
+  Object.entries(sections).forEach(([sec, items]) => {
+    const el = document.createElement('div');
+    el.className = 'section';
+    el.innerHTML = `<div class="section-header">${sec}</div>`;
+    items.forEach(task => {
+      const done = !!completions[task.id];
+      const row = document.createElement('div');
+      row.className = `task-item${done ? ' done' : ''}`;
+      row.dataset.id = task.id;
+      row.innerHTML = `
+        <div class="pokeball${done ? ' checked' : ''}" id="pb_${task.id}"></div>
+        <div class="task-text">${task.text}</div>`;
+      row.addEventListener('click', () => toggleTask(task.id));
+      el.appendChild(row);
+    });
+    container.appendChild(el);
+  });
+}
+
+async function toggleTask(id) {
+  completions[id] = !completions[id];
+
+  const row = document.querySelector(`[data-id="${id}"]`);
+  const pb  = document.getElementById(`pb_${id}`);
+  row.classList.toggle('done', !!completions[id]);
+  pb.classList.toggle('checked', !!completions[id]);
+  pb.classList.add('bounce');
+  setTimeout(() => pb.classList.remove('bounce'), 400);
+
+  updateProgress();
+
+  await db.collection('checklist').doc(today).set({
+    completions,
+    date: today,
+    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+  }, { merge: true });
+}
+
+function updateProgress() {
+  const total = tasks.length;
+  const done  = tasks.filter(t => completions[t.id]).length;
+  const pct   = total ? (done / total * 100) : 0;
+
+  document.getElementById('progressText').textContent = `${done} / ${total}`;
+  document.getElementById('progressBar').style.width  = pct + '%';
+  document.getElementById('starsRow').textContent = '⭐'.repeat(done) + '☆'.repeat(total - done);
+
+  if (done === total && total > 0 && !shownMilestones.includes('final')) {
+    setTimeout(() => showMilestone('final'), 500);
+  } else if (done > 0 && done % 3 === 0 && !shownMilestones.includes(done) && done < total) {
+    setTimeout(() => showMilestone(done), 500);
+  }
+}
+
+function showMilestone(key) {
+  shownMilestones.push(key);
+  localStorage.setItem('ms_' + today, JSON.stringify(shownMilestones));
+
+  const m = key === 'final' ? FINAL : MILESTONES[key];
+  if (!m) return;
+  document.getElementById('mEmoji').textContent = m.emoji;
+  document.getElementById('mTitle').textContent  = m.title;
+  document.getElementById('mSub').textContent    = m.sub;
+  document.getElementById('overlay').classList.add('show');
+  spawnConfetti();
+}
+
+function closeOverlay() {
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function spawnConfetti() {
+  const wrap   = document.getElementById('confettiWrap');
+  const colors = ['#e63946','#FFD700','#4CAF50','#2196F3','#FF69B4','#fff'];
+  for (let i = 0; i < 50; i++) {
+    const p = document.createElement('div');
+    p.className = 'cp';
+    const size = 6 + Math.random() * 10;
+    p.style.cssText = `
+      left:${Math.random()*100}vw;
+      top:-10px;
+      width:${size}px; height:${size}px;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      border-radius:${Math.random()>.5?'50%':'3px'};
+      animation-delay:${Math.random()*0.8}s;
+    `;
+    wrap.appendChild(p);
+    setTimeout(() => p.remove(), 2800);
+  }
+}
+
+init();
+</script>
+</body>
+</html>
